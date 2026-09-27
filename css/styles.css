@@ -102,7 +102,7 @@ body {
   }
 }
 
-/* Dark mode theme */
+/* Dark mode */
 [data-theme="dark"] {
   --fc-bg: #14132a;
   --fc-nav-bg: #1a1836;
@@ -150,6 +150,20 @@ body {
 [data-theme="dark"] .card-panel.white {
   background-color: var(--fc-surface) !important;
   box-shadow: var(--fc-shadow);
+}
+
+/* Dark mode for plain back to white text */
+[data-theme="dark"] .card-panel h3,
+[data-theme="dark"] .card-panel h4,
+[data-theme="dark"] .card-panel h5,
+[data-theme="dark"] .card-panel h6,
+[data-theme="dark"] .card-panel p {
+  color: var(--fc-text-primary);
+}
+
+/* Icons in dark mode */
+[data-theme="dark"] .input-field > i.material-icons.prefix {
+  color: var(--fc-text-secondary) !important;
 }
 
 [data-theme="dark"] .grey-text.text-darken-4 {
@@ -237,9 +251,13 @@ body {
 
 /* Theme toggle button */
 .theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
   padding: 0 8px;
 }
 
 .theme-toggle-icon {
   vertical-align: middle;
+  color: #b8860b !important;
 }
