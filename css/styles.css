@@ -119,7 +119,7 @@ body {
 }
 
 [data-theme="dark"] body.grey.lighten-4 {
-  background-color: var(--fc-bg);
+  background-color: var(--fc-bg) !important;
 }
 
 [data-theme="dark"] nav.white.z-depth-0 {
@@ -152,7 +152,7 @@ body {
   box-shadow: var(--fc-shadow);
 }
 
-/* Dark mode for plain back to white text */
+/* Fixes theme specifics */
 [data-theme="dark"] .card-panel h3,
 [data-theme="dark"] .card-panel h4,
 [data-theme="dark"] .card-panel h5,
@@ -161,7 +161,7 @@ body {
   color: var(--fc-text-primary);
 }
 
-/* Icons in dark mode */
+/* Materialize's default prefix-icons  */
 [data-theme="dark"] .input-field > i.material-icons.prefix {
   color: var(--fc-text-secondary) !important;
 }
