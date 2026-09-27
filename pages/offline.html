@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Feelings Catcher | Offline</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
+        background-color: #f4f3fa;
+        color: #2e2e2e;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+
+      .offline-card {
+        max-width: 420px;
+        text-align: center;
+      }
+
+      .bubble-icon {
+        width: 72px;
+        height: 72px;
+        margin: 0 auto 24px;
+      }
+
+      .bubble-icon svg {
+        width: 100%;
+        height: 100%;
+      }
+
+      h1 {
+        font-size: 1.6rem;
+        color: #283593;
+        margin-bottom: 12px;
+        font-weight: 600;
+      }
+
+      p {
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #5a5a5a;
+        margin-bottom: 28px;
+      }
+
+      button {
+        font-family: inherit;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: #ffffff;
+        background-color: #283593;
+        border: none;
+        border-radius: 4px;
+        padding: 12px 28px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+      }
+
+      button:hover {
+        background-color: #1f2a75;
+      }
+
+      button:active {
+        background-color: #18215c;
+      }
+
+      .note {
+        margin-top: 20px;
+        font-size: 0.85rem;
+        color: #9a9a9a;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="offline-card">
+      <div class="bubble-icon">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M50 12 C 25.7 12, 8 28.8, 8 49 C 8 60.5, 14.2 70.8, 24.2 77.5 L 20 90 L 36 81.5 C 40.4 82.8, 45.1 83.5, 50 83.5 C 74.3 83.5, 92 66.7, 92 46.5 C 92 26.3, 74.3 12, 50 12 Z"
+            fill="none"
+            stroke="#283593"
+            stroke-width="5"
+            stroke-linejoin="round"
+            stroke-linecap="round"
+          />
+
+          <!-- soundwave bars -->
+          <rect x="32" y="46" width="6" height="14" rx="3" fill="#283593" />
+          <rect x="42" y="38" width="6" height="30" rx="3" fill="#283593" />
+          <rect x="52" y="30" width="6" height="46" rx="3" fill="#283593" />
+          <rect x="62" y="38" width="6" height="30" rx="3" fill="#283593" />
+          <rect x="72" y="46" width="6" height="14" rx="3" fill="#283593" />
+
+          <!-- "person" dot atop the tallest bar -->
+          <circle cx="55" cy="24" r="6" fill="#283593" />
+
+          <!-- spark accent -->
+          <path
+            d="M74 22 C 74.5 26, 77 28.5, 81 29 C 77 29.5, 74.5 32, 74 36 C 73.5 32, 71 29.5, 67 29 C 71 28.5, 73.5 26, 74 22 Z"
+            fill="#283593"
+          />
+        </svg>
+      </div>
+
+      <h1>Signal's out, but you're not</h1>
+      <p>
+        No connection right now, but that's alright — Feelings Catcher still
+        works. Anything you've already opened is saved on this device, and new
+        entries you catch will sync once you're back in range.
+      </p>
+
+      <button onclick="window.location.reload()">Try again</button>
+
+      <p class="note">
+        This page is being shown because the page you tried to reach isn't
+        available offline yet.
+      </p>
+    </div>
+  </body>
+</html>

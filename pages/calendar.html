@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Calendar | Feelings Catcher</title>
+
+    <!-- Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <link rel="stylesheet" href="../css/materialize.min.css" />
+
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="../css/styles.css" />
+  </head>
+
+  <body class="grey lighten-4">
+    <header>
+      <nav class="white z-depth-0">
+        <div class="nav-wrapper container">
+          <a
+            href="../index.html"
+            class="brand-logo indigo-text text-darken-3 left"
+          >
+            Feelings Catcher
+          </a>
+
+          <a
+            href="#"
+            data-target="mobile-menu"
+            class="sidenav-trigger right"
+            aria-label="Open navigation menu"
+          >
+            <i class="material-icons black-text">menu</i>
+          </a>
+
+          <ul class="right hide-on-med-and-down">
+            <li>
+              <a href="../index.html" class="grey-text text-darken-4">Home</a>
+            </li>
+            <li>
+              <a href="calendar.html" class="grey-text text-darken-4"
+                >Calendar</a
+              >
+            </li>
+            <li>
+              <a href="profile.html" class="grey-text text-darken-4">Profile</a>
+            </li>
+            <li>
+              <a href="about.html" class="grey-text text-darken-4">About</a>
+            </li>
+            <li>
+              <a href="contact.html" class="grey-text text-darken-4">Contact</a>
+            </li>
+            <li>
+              <button
+                id="installApp"
+                hidden
+                class="btn-small indigo darken-3 waves-effect waves-light"
+                type="button"
+              >
+                Install App
+              </button>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+
+    <ul class="sidenav" id="mobile-menu">
+      <li>
+        <div class="user-view indigo darken-3">
+          <span class="white-text name">Feelings Catcher</span>
+          <span class="white-text email">Catch it. Name it. Move on.</span>
+        </div>
+      </li>
+      <li>
+        <a href="../index.html"><i class="material-icons">home</i>Home</a>
+      </li>
+      <li>
+        <a href="calendar.html"
+          ><i class="material-icons">calendar_today</i>Calendar</a
+        >
+      </li>
+      <li>
+        <a href="profile.html"
+          ><i class="material-icons">account_circle</i>Profile</a
+        >
+      </li>
+      <li>
+        <a href="about.html"><i class="material-icons">info_outline</i>About</a>
+      </li>
+      <li>
+        <a href="contact.html"
+          ><i class="material-icons">mail_outline</i>Contact</a
+        >
+      </li>
+      <li>
+        <button
+          id="installAppMobile"
+          hidden
+          class="btn-small indigo darken-3 waves-effect waves-light"
+          type="button"
+          style="margin: 16px"
+        >
+          Install App
+        </button>
+      </li>
+    </ul>
+
+    <main class="container section">
+      <div class="card-panel white">
+        <p class="indigo-text text-darken-3"><strong>CALENDAR VIEW</strong></p>
+
+        <h3 class="grey-text text-darken-4">Your feelings over time</h3>
+
+        <p class="flow-text grey-text text-darken-1">
+          Every entry you catch gets filed onto the calendar automatically, so
+          you can look back over days, weeks, and months and start to notice
+          patterns in what you were doing whenever a particular feeling showed
+          up.
+        </p>
+
+        <div class="row valign-wrapper">
+          <div class="col s8">
+            <h5 class="grey-text text-darken-4">September 2026</h5>
+          </div>
+          <div class="col s4 right-align">
+            <span class="grey-text text-darken-1">
+              <span class="calendar-legend-dot"></span>Entry logged
+            </span>
+          </div>
+        </div>
+
+        <div class="calendar-grid">
+          <div class="calendar-heading">S</div>
+          <div class="calendar-heading">M</div>
+          <div class="calendar-heading">T</div>
+          <div class="calendar-heading">W</div>
+          <div class="calendar-heading">T</div>
+          <div class="calendar-heading">F</div>
+          <div class="calendar-heading">S</div>
+
+          <div class="calendar-cell is-empty"></div>
+          <div class="calendar-cell is-empty"></div>
+          <div class="calendar-cell">1</div>
+          <div class="calendar-cell">2</div>
+          <div class="calendar-cell">3</div>
+          <div class="calendar-cell has-entry">4</div>
+          <div class="calendar-cell">5</div>
+          <div class="calendar-cell">6</div>
+          <div class="calendar-cell">7</div>
+          <div class="calendar-cell">8</div>
+          <div class="calendar-cell has-entry">9</div>
+          <div class="calendar-cell">10</div>
+          <div class="calendar-cell">11</div>
+          <div class="calendar-cell">12</div>
+          <div class="calendar-cell">13</div>
+          <div class="calendar-cell">14</div>
+          <div class="calendar-cell has-entry">15</div>
+          <div class="calendar-cell">16</div>
+          <div class="calendar-cell">17</div>
+          <div class="calendar-cell">18</div>
+          <div class="calendar-cell">19</div>
+          <div class="calendar-cell">20</div>
+          <div class="calendar-cell">21</div>
+          <div class="calendar-cell has-entry">22</div>
+          <div class="calendar-cell">23</div>
+          <div class="calendar-cell">24</div>
+          <div class="calendar-cell">25</div>
+          <div class="calendar-cell">26</div>
+          <div class="calendar-cell has-entry">27</div>
+          <div class="calendar-cell">28</div>
+          <div class="calendar-cell">29</div>
+          <div class="calendar-cell">30</div>
+          <div class="calendar-cell is-empty"></div>
+          <div class="calendar-cell is-empty"></div>
+          <div class="calendar-cell is-empty"></div>
+        </div>
+
+        <p class="center-align grey-text section">
+          Static mockup for now - tapping a day will open that day's entries in
+          a later step.
+        </p>
+
+        <a
+          href="../index.html"
+          class="btn indigo darken-3 waves-effect waves-light"
+        >
+          <i class="material-icons left">arrow_back</i>
+          Back to Feelings
+        </a>
+      </div>
+    </main>
+
+    <script src="../js/materialize.min.js"></script>
+    <script src="../js/ui.js"></script>
+    <script src="../js/app.js"></script>
+  </body>
+</html>
