@@ -1,4 +1,3 @@
-
 body {
   min-height: 100vh;
 }
@@ -101,4 +100,146 @@ body {
   .calendar-cell {
     font-size: 0.7rem;
   }
+}
+
+/* Dark mode theme */
+[data-theme="dark"] {
+  --fc-bg: #14132a;
+  --fc-nav-bg: #1a1836;
+  --fc-surface: #201f3d;
+  --fc-text-primary: #f4f3fa;
+  --fc-text-secondary: #b7b3d9;
+  --fc-text-muted: #8a87ad;
+  --fc-accent: #9fa8da;
+  --fc-stress: #ff8a65;
+  --fc-anxiety: #ba68c8;
+  --fc-gratitude: #4db6ac;
+  --fc-border: rgba(255, 255, 255, 0.08);
+  --fc-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] body.grey.lighten-4 {
+  background-color: var(--fc-bg);
+}
+
+[data-theme="dark"] nav.white.z-depth-0 {
+  background-color: var(--fc-nav-bg) !important;
+  border-bottom: 1px solid var(--fc-border);
+}
+
+[data-theme="dark"] .brand-logo.indigo-text.text-darken-3 {
+  color: var(--fc-accent) !important;
+}
+
+[data-theme="dark"] .nav-wrapper > ul.right a.grey-text.text-darken-4 {
+  color: var(--fc-text-secondary) !important;
+}
+
+[data-theme="dark"] .sidenav {
+  background-color: var(--fc-surface);
+}
+
+[data-theme="dark"] .sidenav li > a {
+  color: var(--fc-text-primary);
+}
+
+[data-theme="dark"] .sidenav li > a .material-icons {
+  color: var(--fc-text-secondary);
+}
+
+[data-theme="dark"] .card-panel.white {
+  background-color: var(--fc-surface) !important;
+  box-shadow: var(--fc-shadow);
+}
+
+[data-theme="dark"] .grey-text.text-darken-4 {
+  color: var(--fc-text-primary) !important;
+}
+
+[data-theme="dark"] .grey-text.text-darken-1 {
+  color: var(--fc-text-secondary) !important;
+}
+
+[data-theme="dark"] .grey-text:not(.text-darken-1):not(.text-darken-4) {
+  color: var(--fc-text-muted) !important;
+}
+
+[data-theme="dark"] .black-text {
+  color: var(--fc-text-primary) !important;
+}
+
+[data-theme="dark"] .deep-orange-text.text-darken-2 {
+  color: var(--fc-stress) !important;
+}
+
+[data-theme="dark"] .purple-text.text-darken-2 {
+  color: var(--fc-anxiety) !important;
+}
+
+[data-theme="dark"] .teal-text.text-darken-2 {
+  color: var(--fc-gratitude) !important;
+}
+
+[data-theme="dark"] .divider {
+  background-color: var(--fc-border);
+}
+
+[data-theme="dark"] .input-field input,
+[data-theme="dark"] .input-field textarea,
+[data-theme="dark"] .input-field select {
+  color: var(--fc-text-primary);
+  border-bottom: 1px solid var(--fc-border);
+}
+
+[data-theme="dark"] .input-field label {
+  color: var(--fc-text-muted);
+}
+
+[data-theme="dark"] .dropdown-content {
+  background-color: var(--fc-surface);
+}
+
+[data-theme="dark"] .dropdown-content li > a,
+[data-theme="dark"] .dropdown-content li > span {
+  color: var(--fc-text-primary);
+}
+
+[data-theme="dark"] .switch label .lever {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="dark"] .switch label input[type="checkbox"]:checked + .lever {
+  background-color: var(--fc-accent);
+}
+
+/* Calendar mockup */
+[data-theme="dark"] .calendar-heading {
+  color: var(--fc-text-muted);
+}
+
+[data-theme="dark"] .calendar-cell {
+  background: var(--fc-surface);
+  color: var(--fc-text-secondary);
+}
+
+[data-theme="dark"] .calendar-cell.has-entry {
+  background: #2a2960;
+  color: #c5caf0;
+}
+
+[data-theme="dark"] .calendar-cell.has-entry::after {
+  background: var(--fc-accent);
+}
+
+[data-theme="dark"] .calendar-legend-dot {
+  background: var(--fc-accent);
+}
+
+/* Theme toggle button */
+.theme-toggle-btn {
+  padding: 0 8px;
+}
+
+.theme-toggle-icon {
+  vertical-align: middle;
 }
