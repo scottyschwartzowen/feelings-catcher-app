@@ -14,10 +14,6 @@ const APP_SHELL_FILES = [
   "/images/icons/icon-256.png",
   "/images/icons/icon-512.png",
   "/images/icons/maskable-512.png",
-  "/pages/about.html",
-  "/pages/calendar.html",
-  "/pages/contact.html",
-  "/pages/profile.html",
   "/pages/offline.html", // simple fallback page
 ];
 
