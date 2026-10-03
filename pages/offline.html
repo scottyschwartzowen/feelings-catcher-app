@@ -2,6 +2,20 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+
+    <!-- Set the theme to dark unless the visitor already chose light -->
+    <script>
+      (function () {
+        var theme = "dark";
+        try {
+          if (localStorage.getItem("feelings-catcher-theme") === "light") {
+            theme = "light";
+          }
+        } catch (err) {}
+        document.documentElement.setAttribute("data-theme", theme);
+      })();
+    </script>
+    
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Feelings Catcher | Offline</title>
     <style>

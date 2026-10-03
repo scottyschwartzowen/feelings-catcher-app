@@ -11,8 +11,6 @@ const APP_SHELL_FILES = [
   "/js/ui.js",
   "/manifest.json",
   "/images/icons/icon-192.png",
-  "/images/icons/icon-256.png",
-  "/images/icons/icon-512.png",
   "/images/icons/maskable-512.png",
   "/pages/offline.html", // simple fallback page
 ];
