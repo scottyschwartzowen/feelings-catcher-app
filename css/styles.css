@@ -152,6 +152,22 @@ body {
   box-shadow: var(--fc-shadow);
 }
 
+/* Materialize switches nav <-> hamburger at 993px, but with the theme toggle and Install App button added, the desktop nav needs more room than that before it fits without overlapping the logo. Pushes the switch-over out to 1200px. Loaded after materialize.min.css, so these work at the widths they target. */
+@media only screen and (max-width: 1100px) {
+  nav ul.right.hide-on-med-and-down {
+    display: none !important;
+  }
+  nav .sidenav-trigger {
+    display: block !important;
+  }
+}
+
+@media only screen and (min-width: 1101px) {
+  nav .sidenav-trigger {
+    display: none !important;
+  }
+}
+
 /* Fixes theme specifics */
 [data-theme="dark"] .card-panel h3,
 [data-theme="dark"] .card-panel h4,
