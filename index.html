@@ -15,7 +15,7 @@
         document.documentElement.setAttribute("data-theme", theme);
       })();
     </script>
-
+    
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Feelings Catcher</title>
 
@@ -181,7 +181,7 @@
             </p>
           </div>
 
-          <div class="col sm12 m4">
+          <div class="col s12 m4">
             <div class="card-panel white center-align">
               <i class="material-icons medium indigo-text text-darken-3"
                 >graphic_eq</i
@@ -201,127 +201,20 @@
           </div>
           <div class="col s4 right-align">
             <span
+              id="feeling-count"
               class="new badge indigo darken-3"
-              data-badge-caption="sample entries"
+              data-badge-caption="entries"
             >
-              3
+              0
             </span>
           </div>
         </div>
 
-        <!-- Feeling 1 -->
-        <div class="card-panel white feeling-card">
-          <div class="row valign-wrapper no-margin-bottom">
-            <div class="col s3 m2 center-align">
-              <i class="material-icons medium deep-orange-text text-darken-2"
-                >bolt</i
-              >
-            </div>
+        <!-- Status message (loading / errors) -->
+        <p id="feeling-status" class="grey-text text-darken-1" aria-live="polite"></p>
 
-            <div class="col s7 m8">
-              <span class="deep-orange-text text-darken-3"
-                ><strong>STRESS</strong></span
-              >
-              <h5 class="black-text">Deadline pressure spike</h5>
-              <p class="grey-text text-darken-1">
-                Felt my chest tighten during the client call, noticed I was
-                struggling to articulate my words.
-              </p>
-              <p class="grey-text">
-                <i class="material-icons tiny">schedule</i>
-                Logged from desk &nbsp; | &nbsp; 9:42AM
-              </p>
-            </div>
-
-            <div class="col s2 m2 right-align">
-              <button
-                class="btn-flat"
-                type="button"
-                aria-label="Delete deadline pressure entry"
-              >
-                <i class="material-icons grey-text text-darken-1"
-                  >delete_outline</i
-                >
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Feeling 2 -->
-        <div class="card-panel white feeling-card">
-          <div class="row valign-wrapper no-margin-bottom">
-            <div class="col s3 m2 center-align">
-              <i class="material-icons medium purple-text text-darken-2"
-                >psychology</i
-              >
-            </div>
-
-            <div class="col s7 m8">
-              <span class="purple-text text-darken-3"
-                ><strong>ANXIETY</strong></span
-              >
-              <h5 class="black-text">Pre-meeting nerves</h5>
-              <p class="grey-text text-darken-1">
-                Stomach tightened waiting outside my home office for a client
-                zoom website re-design demo.
-              </p>
-              <p class="grey-text">
-                <i class="material-icons tiny">schedule</i>
-                Logged from hallway &nbsp; | &nbsp; 1:15PM
-              </p>
-            </div>
-
-            <div class="col s2 m2 right-align">
-              <button
-                class="btn-flat"
-                type="button"
-                aria-label="Delete pre-meeting nerves entry"
-              >
-                <i class="material-icons grey-text text-darken-1"
-                  >delete_outline</i
-                >
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Feeling 3 -->
-        <div class="card-panel white feeling-card">
-          <div class="row valign-wrapper no-margin-bottom">
-            <div class="col s3 m2 center-align">
-              <i class="material-icons medium teal-text text-darken-2"
-                >favorite</i
-              >
-            </div>
-
-            <div class="col s7 m8">
-              <span class="teal-text text-darken-3"
-                ><strong>GRATITUDE</strong></span
-              >
-              <h5 class="black-text">Quiet coffee moment</h5>
-              <p class="grey-text text-darken-1">
-                Sat outside for five minutes and just noticed the warmth of the
-                cup and the quiet.
-              </p>
-              <p class="grey-text">
-                <i class="material-icons tiny">schedule</i>
-                Logged from front porch &nbsp; | &nbsp; 7:05AM
-              </p>
-            </div>
-
-            <div class="col s2 m2 right-align">
-              <button
-                class="btn-flat"
-                type="button"
-                aria-label="Delete quiet coffee moment entry"
-              >
-                <i class="material-icons grey-text text-darken-1"
-                  >delete_outline</i
-                >
-              </button>
-            </div>
-          </div>
-        </div>
+        <!-- Feelings are rendered here by app.js -->
+        <div id="feelings-list"></div>
 
         <!-- Add button -->
         <div class="center-align section">
@@ -341,7 +234,7 @@
     <!-- New Feeling Form -->
     <div class="sidenav" id="feeling-form">
       <form class="container section" id="add-feeling-form">
-        <h5 class="indigo-text text-darken-3">Catch a New Feeling</h5>
+        <h5 id="form-title" class="indigo-text text-darken-3">Catch a New Feeling</h5>
         <p class="grey-text text-darken-3">
           Notice it, name it, and write down what's happening in the moment.
         </p>
@@ -409,16 +302,16 @@
         <!-- Submit Button -->
         <div class="center-align section">
           <button
+            id="save-feeling"
             class="btn indigo darken-3 waves-effect waves-light"
             type="submit"
           >
             Catch This Feeling<i class="material-icons right">check</i>
           </button>
+          <button type="button" id="cancel-edit" class="btn-flat" hidden>
+            Cancel
+          </button>
         </div>
-
-        <p class="center-align grey-text">
-          This form is UI only for now &mdash; entries aren't saved yet.
-        </p>
       </form>
     </div>
 

@@ -26,31 +26,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const selectFields = document.querySelectorAll("select");
   M.FormSelect.init(selectFields);
-
-  const addFeelingForm = document.querySelector("#add-feeling-form");
-
-  if (addFeelingForm) {
-    addFeelingForm.addEventListener("submit", async (event) => {
-      event.preventDefault();
-
-      const formData = new FormData(addFeelingForm);
-      const feeling = {
-        id: crypto.randomUUID(),
-        createdAt: new Date().toISOString(),
-        ...Object.fromEntries(formData),
-      };
-
-      try {
-        await saveFeeling(feeling);
-        M.toast({ html: "Feeling saved." });
-        addFeelingForm.reset();
-        M.FormSelect.init(document.querySelectorAll("select"));
-      } catch (err) {
-        console.error("Failed to save feeling:", err);
-        M.toast({
-          html: "Something went wrong saving that feeling.",
-        });
-      }
-    });
-  }
 });

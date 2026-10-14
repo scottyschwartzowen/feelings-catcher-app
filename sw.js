@@ -1,5 +1,5 @@
-const STATIC_CACHE = "feelings-catcher-static-v1";
-const DYNAMIC_CACHE = "feelings-catcher-dynamic-v1";
+const STATIC_CACHE = "feelings-catcher-static-v2";
+const DYNAMIC_CACHE = "feelings-catcher-dynamic-v2";
 const CACHE_PREFIX = "feelings-catcher-";
 const APP_SHELL_CACHE = `${STATIC_CACHE}-shell`;
 const CURRENT_CACHES = [APP_SHELL_CACHE, DYNAMIC_CACHE];
@@ -15,6 +15,8 @@ const APP_SHELL_FILES = [
   "/js/materialize.min.js",
   "/js/app.js",
   "/js/ui.js",
+  "/js/feelingsService.js",
+  "/js/firebaseConfig.js",
   "/images/icons/icon-192.png",
   "/images/icons/icon-256.png",
   "/images/icons/icon-512.png",
@@ -54,9 +56,14 @@ function isAPIRequested(url) {
   );
 }
 
+// Firestore talks to this host live; the service worker should stay out of it.
+function isFirestoreRequest(url) {
+  return url.hostname === "firestore.googleapis.com";
+}
+
 function isApprovedExternalAsset(url) {
   return [
-    "cdnjs.cloudflare.com",
+    "www.gstatic.com", // Firebase SDK modules
     "fonts.googleapis.com",
     "fonts.gstatic.com",
   ].includes(url.hostname);
@@ -110,6 +117,8 @@ self.addEventListener("fetch", (event) => {
   if (request.method !== "GET") return;
 
   const url = new URL(request.url);
+
+  if (isFirestoreRequest(url)) return; // let the browser handle it normally
 
   if (isAPIRequested(url)) {
     event.respondWith(fetch(request));
