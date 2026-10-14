@@ -210,6 +210,23 @@ body {
   color: var(--fc-gratitude) !important;
 }
 
+/* Dark theme icon colors */
+[data-theme="dark"] .red-text.text-darken-2 {
+  color: #ff8a80 !important;
+}
+[data-theme="dark"] .pink-text.text-darken-2 {
+  color: #f48fb1 !important;
+}
+[data-theme="dark"] .blue-text.text-darken-2 {
+  color: #64b5f6 !important;
+}
+[data-theme="dark"] .green-text.text-darken-2 {
+  color: #81c784 !important;
+}
+[data-theme="dark"] .amber-text.text-darken-2 {
+  color: #ffd54f !important;
+}
+
 [data-theme="dark"] .divider {
   background-color: var(--fc-border);
 }
@@ -276,4 +293,11 @@ body {
 .theme-toggle-icon {
   vertical-align: middle;
   color: #b8860b !important;
+}
+
+/* Delete and Edit button stacking for mobile */
+.feeling-card .btn-flat {
+  display: block;
+  margin-left: auto;
+  padding: 0 8px;
 }
