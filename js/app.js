@@ -300,6 +300,7 @@ if (list) {
   });
 }
 
+// Edit
 function startEdit(id) {
   const feeling = currentFeelings.find((item) => item.id === id);
   if (!feeling || !form) return;
@@ -329,6 +330,7 @@ function startEdit(id) {
   }
 }
 
+// Form reset
 function resetFormState() {
   editingFeelingId = null;
   form.reset();
