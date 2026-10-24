@@ -39,16 +39,18 @@ export async function loadFeelingOnce() {
 }
 
 // Read (for homepage)
+// render(feelings, metadata) - metadata tells you fromCache / hasPendingWrites
 export function watchFeelings(render, onError) {
   const feelingQuery = query(feelingRef, orderBy("createdAt", "desc"));
   return onSnapshot(
     feelingQuery,
+    { includeMetadataChanges: true },
     (snapshot) => {
       const feelings = snapshot.docs.map((docSnap) => ({
         id: docSnap.id,
         ...docSnap.data({ serverTimestamps: "estimate" }),
       }));
-      render(feelings);
+      render(feelings, snapshot.metadata);
     },
     (error) => {
       if (onError) onError(error);

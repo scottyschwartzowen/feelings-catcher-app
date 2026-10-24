@@ -5,7 +5,9 @@ import {
   deleteFeeling,
 } from "./feelingsService.js";
 
-// Install logic
+import { readAllFeelings, replaceFeelings } from "./idb-storage.js";
+
+// PWA: Install logic
 let installPrompt = null;
 const installBtn = document.querySelector("#installApp");
 const installBtnMobile = document.querySelector("#installAppMobile");
@@ -100,9 +102,35 @@ const formTitle = document.querySelector("#form-title");
 const saveButton = document.querySelector("#save-feeling");
 const cancelEditButton = document.querySelector("#cancel-edit");
 const feelingFormPanel = document.querySelector("#feeling-form");
+const dataSource = document.querySelector("#data-source");
 
 let editingFeelingId = null;
 let currentFeelings = [];
+let serverSnapshotReceived = false;
+let firebaseListenerStarted = false;
+
+function showDataSource(message) {
+  if (dataSource) dataSource.textContent = message;
+}
+
+function requireOnline() {
+  if (navigator.onLine) return true;
+  showToast("Connect to the internet to add, edit or delete feelings");
+  return false;
+}
+
+function toLocalFeeling(item) {
+  return {
+    id: item.id,
+    title: item.title || "",
+    feelingTag: item.feelingTag || "other",
+    entry: item.entry || "",
+    status: item.status || "active",
+    context: item.context || "",
+    createdAtMs: item.createdAt?.toMillis?.() ?? null,
+    updatedAtMs: item.updatedAt?.toMillis?.() ?? null,
+  };
+}
 
 // Toast message
 function showToast(message) {
@@ -186,11 +214,12 @@ function feelingDetails(tag) {
 }
 
 // Format timestamp
-function formatTimestamp(timestamp) {
-  if (!timestamp || typeof timestamp.toDate !== "function") {
+// Takes milliseconds (createdAtMs), so it works for Firebase and IndexedDB data
+function formatTimestamp(ms) {
+  if (typeof ms !== "number") {
     return "Saving...";
   }
-  return timestamp.toDate().toLocaleString([], {
+  return new Date(ms).toLocaleString([], {
     month: "short",
     day: "numeric",
     hour: "numeric",
@@ -241,7 +270,7 @@ function renderFeelings(feelings) {
               <p class="grey-text text-darken-1">${escapeHtml(feeling.entry)}</p>
               <p class="grey-text">
                 <i class="material-icons tiny">schedule</i>
-                ${where}${formatTimestamp(feeling.createdAt)}
+                ${where}${formatTimestamp(feeling.createdAtMs)}
               </p>
             </div>
             <div class="col s2 m2 right-align">
@@ -281,6 +310,7 @@ if (list) {
 
     const deleteButton = event.target.closest(".delete-feeling");
     if (!deleteButton) return;
+    if (!requireOnline()) return;
 
     const id = deleteButton.dataset.id;
     const feeling = currentFeelings.find((item) => item.id === id);
@@ -302,6 +332,7 @@ if (list) {
 
 // Edit
 function startEdit(id) {
+  if (!requireOnline()) return;
   const feeling = currentFeelings.find((item) => item.id === id);
   if (!feeling || !form) return;
 
@@ -361,6 +392,7 @@ if (cancelEditButton) {
 if (form) {
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
+    if (!requireOnline()) return;
 
     const values = {
       title: document.querySelector("#title").value.trim(),
@@ -389,11 +421,60 @@ if (form) {
   });
 }
 
-// Load and live-update the list
+async function showSavedFeelings() {
+  try {
+    const saved = await readAllFeelings();
+    if (!serverSnapshotReceived) {
+      renderFeelings(saved);
+      showDataSource(
+        !navigator.onLine
+          ? "Offline: showing feelings saved on this device"
+          : saved.length
+            ? "Showing saved feelings from this device"
+            : "No feelings saved on this device yet",
+      );
+    }
+  } catch (err) {
+    console.error("Could not read IndexedDB:", err);
+    showDataSource("Local storage could not be opened");
+  }
+}
+
+function connectToFirebase() {
+  if (!navigator.onLine || firebaseListenerStarted) return;
+  firebaseListenerStarted = true;
+
+  watchFeelings(
+    (feelings, metadata) => {
+      // Ignore cache-only snapshots until we have real server data
+      if (metadata.fromCache && !serverSnapshotReceived) return;
+      if (!metadata.fromCache) serverSnapshotReceived = true;
+
+      const plain = feelings.map(toLocalFeeling);
+      renderFeelings(plain);
+      showDataSource("Showing the latest feelings from Firebase");
+
+      // Only copy confirmed server data into IndexedDB
+      if (!metadata.fromCache && !metadata.hasPendingWrites) {
+        replaceFeelings(plain).catch((error) => {
+          console.error("Could not update IndexedDB:", error);
+        });
+      }
+    },
+    (error) => {
+      console.error("Could not load Firebase feelings:", error);
+      firebaseListenerStarted = false; // allow a retry when back online
+      showDataSource("Firebase is unavailable. Showing saved feelings");
+    },
+  );
+}
+
+// Start up (only on pages that have the feelings list)
 if (list && statusMessage) {
-  statusMessage.textContent = "Loading feelings...";
-  watchFeelings(renderFeelings, (error) => {
-    console.error("Could not load feelings:", error);
-    statusMessage.textContent = "Could not load feelings.";
-  });
+  showSavedFeelings();
+  connectToFirebase();
+  window.addEventListener("online", connectToFirebase);
+  window.addEventListener("offline", () =>
+    showDataSource("Offline: showing feelings saved on this device"),
+  );
 }

@@ -1,5 +1,5 @@
-const STATIC_CACHE = "feelings-catcher-static-v2";
-const DYNAMIC_CACHE = "feelings-catcher-dynamic-v2";
+const STATIC_CACHE = "feelings-catcher-static-v3";
+const DYNAMIC_CACHE = "feelings-catcher-dynamic-v3";
 const CACHE_PREFIX = "feelings-catcher-";
 const APP_SHELL_CACHE = `${STATIC_CACHE}-shell`;
 const CURRENT_CACHES = [APP_SHELL_CACHE, DYNAMIC_CACHE];
@@ -17,6 +17,7 @@ const APP_SHELL_FILES = [
   "/js/ui.js",
   "/js/feelingsService.js",
   "/js/firebaseConfig.js",
+  "/js/idb-storage.js",
   "/images/icons/icon-192.png",
   "/images/icons/icon-256.png",
   "/images/icons/icon-512.png",
