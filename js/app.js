@@ -1,11 +1,19 @@
 import {
-  createFeeling,
   watchFeelings,
-  updateFeeling,
-  deleteFeeling,
+  loadFeelingsFromServer,
+  syncFeelingChange,
+  pauseFirestore,
+  resumeFirestore,
 } from "./feelingsService.js";
 
-import { readAllFeelings, replaceFeelings } from "./idb-storage.js";
+import {
+  readAllFeelings,
+  saveFeelingAndQueue,
+  deleteFeelingAndQueue,
+  readPendingChanges,
+  removeSyncedChange,
+  mergeServerFeelings,
+} from "./idb-storage.js";
 
 // PWA: Install logic
 let installPrompt = null;
@@ -106,30 +114,11 @@ const dataSource = document.querySelector("#data-source");
 
 let editingFeelingId = null;
 let currentFeelings = [];
-let serverSnapshotReceived = false;
-let firebaseListenerStarted = false;
+let syncInProgress = false;
+let syncAgain = false;
 
 function showDataSource(message) {
   if (dataSource) dataSource.textContent = message;
-}
-
-function requireOnline() {
-  if (navigator.onLine) return true;
-  showToast("Connect to the internet to add, edit or delete feelings");
-  return false;
-}
-
-function toLocalFeeling(item) {
-  return {
-    id: item.id,
-    title: item.title || "",
-    feelingTag: item.feelingTag || "other",
-    entry: item.entry || "",
-    status: item.status || "active",
-    context: item.context || "",
-    createdAtMs: item.createdAt?.toMillis?.() ?? null,
-    updatedAtMs: item.updatedAt?.toMillis?.() ?? null,
-  };
 }
 
 // Toast message
@@ -149,6 +138,12 @@ function escapeHtml(value = "") {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+// Stable ID made on this device, reused when the change syncs to Firestore
+function makeLocalId() {
+  if (crypto.randomUUID) return crypto.randomUUID();
+  return `feeling-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
 // Feelings (not categories per lecture example)
@@ -310,7 +305,6 @@ if (list) {
 
     const deleteButton = event.target.closest(".delete-feeling");
     if (!deleteButton) return;
-    if (!requireOnline()) return;
 
     const id = deleteButton.dataset.id;
     const feeling = currentFeelings.find((item) => item.id === id);
@@ -320,8 +314,16 @@ if (list) {
 
     try {
       deleteButton.disabled = true;
-      await deleteFeeling(id);
-      showToast("Feeling deleted.");
+      // Remove it from this device and queue the delete for Firestore
+      await deleteFeelingAndQueue(id);
+      await refreshLocalList();
+      await updateSyncMessage();
+      showToast(
+        navigator.onLine
+          ? "Feeling deleted."
+          : "Deleted on this device. It will sync when you are back online.",
+      );
+      void synchronizePendingChanges();
     } catch (error) {
       console.error("Could not delete feeling:", error);
       showToast("Could not delete the feeling.");
@@ -332,7 +334,6 @@ if (list) {
 
 // Edit
 function startEdit(id) {
-  if (!requireOnline()) return;
   const feeling = currentFeelings.find((item) => item.id === id);
   if (!feeling || !form) return;
 
@@ -392,89 +393,195 @@ if (cancelEditButton) {
 if (form) {
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
-    if (!requireOnline()) return;
 
-    const values = {
+    const existing = currentFeelings.find(
+      (item) => item.id === editingFeelingId,
+    );
+    const now = Date.now();
+
+    const feeling = {
+      id: editingFeelingId || makeLocalId(),
       title: document.querySelector("#title").value.trim(),
       feelingTag: document.querySelector("#feeling-tag").value,
       entry: document.querySelector("#entry").value.trim(),
+      context: existing?.context || "",
+      status: "active",
+      createdAtMs: existing?.createdAtMs || now,
+      updatedAtMs: now,
     };
 
     try {
-      saveButton.disabled = true;
+      if (saveButton) saveButton.disabled = true;
 
-      if (editingFeelingId) {
-        await updateFeeling(editingFeelingId, values);
-        showToast("Feeling updated.");
-      } else {
-        await createFeeling(values);
-        showToast("Feeling saved.");
-      }
+      // Save to this device first. The queue sends the change to Firestore.
+      await saveFeelingAndQueue(
+        feeling,
+        editingFeelingId ? "update" : "create",
+      );
+      await refreshLocalList();
+      await updateSyncMessage();
+      showToast(
+        navigator.onLine
+          ? "Feeling saved."
+          : "Saved on this device. It will sync when you are back online.",
+      );
 
       resetFormState();
+      void synchronizePendingChanges();
     } catch (error) {
       console.error("Could not save feeling:", error);
-      showToast("Could not save the feeling. Check Firebase setup and rules.");
+      showToast("Could not save the feeling on this device.");
     } finally {
-      saveButton.disabled = false;
+      if (saveButton) saveButton.disabled = false;
     }
   });
 }
 
-async function showSavedFeelings() {
+// Sync status line under the list heading
+async function updateSyncMessage(message) {
+  let count = 0;
   try {
-    const saved = await readAllFeelings();
-    if (!serverSnapshotReceived) {
-      renderFeelings(saved);
-      showDataSource(
-        !navigator.onLine
-          ? "Offline: showing feelings saved on this device"
-          : saved.length
-            ? "Showing saved feelings from this device"
-            : "No feelings saved on this device yet",
-      );
-    }
-  } catch (err) {
-    console.error("Could not read IndexedDB:", err);
-    showDataSource("Local storage could not be opened");
+    count = (await readPendingChanges()).length;
+  } catch (error) {
+    console.error("Could not read the sync queue:", error);
+  }
+
+  const base =
+    message ||
+    (navigator.onLine
+      ? "Showing feelings from this device."
+      : "Offline: showing feelings saved on this device.");
+
+  showDataSource(
+    count
+      ? `${base} ${count} change${count === 1 ? "" : "s"} waiting to sync.`
+      : base,
+  );
+}
+
+// Re-draw the list from IndexedDB (includes unsent changes)
+async function refreshLocalList() {
+  renderFeelings(await readAllFeelings());
+}
+
+async function synchronizePendingChanges() {
+  if (!navigator.onLine) {
+    await updateSyncMessage();
+    return;
+  }
+
+  // If a sync is already running, ask it to run once more when it finishes
+  if (syncInProgress) {
+    syncAgain = true;
+    return;
+  }
+
+  syncInProgress = true;
+  try {
+    do {
+      syncAgain = false;
+      let failed = false;
+      const changes = await readPendingChanges();
+
+      for (const change of changes) {
+        if (!navigator.onLine) break;
+
+        try {
+          await syncFeelingChange(change);
+          await removeSyncedChange(change.feelingId, change.changeId);
+        } catch (error) {
+          // Keep this change in IndexedDB. The next connection can retry it.
+          console.error("Could not sync a feeling:", error);
+          failed = true;
+          break;
+        }
+      }
+
+      const remaining = await readPendingChanges();
+      if (!remaining.length && navigator.onLine) {
+        try {
+          const serverFeelings = await loadFeelingsFromServer();
+          const merged = await mergeServerFeelings(serverFeelings, false);
+          renderFeelings(merged);
+        } catch (error) {
+          console.warn("Could not refresh the server list yet:", error);
+        }
+      }
+
+      await updateSyncMessage();
+      if (failed || !navigator.onLine) break;
+    } while (syncAgain);
+  } catch (error) {
+    console.error("Could not read the local sync queue:", error);
+    await updateSyncMessage("Could not check the sync queue on this device.");
+  } finally {
+    syncInProgress = false;
+    await updateSyncMessage();
   }
 }
 
-function connectToFirebase() {
-  if (!navigator.onLine || firebaseListenerStarted) return;
-  firebaseListenerStarted = true;
+// Show the local list immediately, then merge Firestore data as it arrives.
+async function startApp() {
+  try {
+    await refreshLocalList();
+    await updateSyncMessage();
+  } catch (error) {
+    console.error("Could not open the local database:", error);
+    showDataSource("Local storage could not be opened on this device.");
+  }
 
-  watchFeelings(
-    (feelings, metadata) => {
-      // Ignore cache-only snapshots until we have real server data
-      if (metadata.fromCache && !serverSnapshotReceived) return;
-      if (!metadata.fromCache) serverSnapshotReceived = true;
+  try {
+    watchFeelings(
+      async (remoteFeelings, metadata) => {
+        try {
+          const possiblyIncomplete =
+            metadata.fromCache || metadata.hasPendingWrites;
+          const merged = await mergeServerFeelings(
+            remoteFeelings,
+            possiblyIncomplete,
+          );
+          renderFeelings(merged);
+          await updateSyncMessage(
+            metadata.fromCache
+              ? "Showing saved feelings while Firestore checks for updates."
+              : "Showing the latest Firestore feelings and local changes.",
+          );
+        } catch (error) {
+          console.error(
+            "Could not combine local and Firestore feelings:",
+            error,
+          );
+        }
+      },
+      (error) => {
+        console.error("Could not listen to Firestore:", error);
+        void updateSyncMessage(
+          "Firestore is not available. Your saved feelings are still on this device.",
+        );
+      },
+    );
+  } catch (error) {
+    console.error("Could not start the Firestore listener:", error);
+    showDataSource(
+      "Firestore is unavailable. Showing feelings from this device.",
+    );
+  }
 
-      const plain = feelings.map(toLocalFeeling);
-      renderFeelings(plain);
-      showDataSource("Showing the latest feelings from Firebase");
-
-      // Only copy confirmed server data into IndexedDB
-      if (!metadata.fromCache && !metadata.hasPendingWrites) {
-        replaceFeelings(plain).catch((error) => {
-          console.error("Could not update IndexedDB:", error);
-        });
-      }
-    },
-    (error) => {
-      console.error("Could not load Firebase feelings:", error);
-      firebaseListenerStarted = false; // allow a retry when back online
-      showDataSource("Firebase is unavailable. Showing saved feelings");
-    },
-  );
+  // Send anything queued while we were offline or closed
+  void synchronizePendingChanges();
 }
 
-// Start up (only on pages that have the feelings list)
+// Only run on pages that have the feelings list
 if (list && statusMessage) {
-  showSavedFeelings();
-  connectToFirebase();
-  window.addEventListener("online", connectToFirebase);
-  window.addEventListener("offline", () =>
-    showDataSource("Offline: showing feelings saved on this device"),
-  );
+  window.addEventListener("online", async () => {
+    await resumeFirestore();
+    void synchronizePendingChanges();
+  });
+  window.addEventListener("offline", () => {
+    void pauseFirestore();
+    void updateSyncMessage();
+  });
+
+  if (!navigator.onLine) void pauseFirestore();
+  void startApp();
 }

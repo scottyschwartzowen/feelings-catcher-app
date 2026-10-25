@@ -1,5 +1,5 @@
-const STATIC_CACHE = "feelings-catcher-static-v3";
-const DYNAMIC_CACHE = "feelings-catcher-dynamic-v3";
+const STATIC_CACHE = "feelings-catcher-static-v4";
+const DYNAMIC_CACHE = "feelings-catcher-dynamic-v4";
 const CACHE_PREFIX = "feelings-catcher-";
 const APP_SHELL_CACHE = `${STATIC_CACHE}-shell`;
 const CURRENT_CACHES = [APP_SHELL_CACHE, DYNAMIC_CACHE];

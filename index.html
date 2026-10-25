@@ -15,7 +15,7 @@
         document.documentElement.setAttribute("data-theme", theme);
       })();
     </script>
-    
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Feelings Catcher</title>
 
@@ -93,16 +93,6 @@
                 <i class="material-icons theme-toggle-icon">light_mode</i>
               </button>
             </li>
-            <li>
-              <button
-                id="installApp"
-                hidden
-                class="btn-small indigo darken-3 waves-effect waves-light"
-                type="button"
-              >
-                Install App
-              </button>
-            </li>
           </ul>
         </div>
       </nav>
@@ -149,17 +139,6 @@
           <i class="material-icons theme-toggle-icon">light_mode</i>
         </button>
       </li>
-      <li>
-        <button
-          id="installAppMobile"
-          hidden
-          class="btn-small indigo darken-3 waves-effect waves-light"
-          type="button"
-          style="margin: 16px"
-        >
-          Install App
-        </button>
-      </li>
     </ul>
 
     <!-- Main content -->
@@ -184,10 +163,21 @@
           <div class="col s12 m4">
             <div class="card-panel white center-align">
               <i class="material-icons medium indigo-text text-darken-3"
-                >graphic_eq</i
+                >cloud_done</i
               >
-              <h6>Project Setup</h6>
-              <p class="grey-text">Static interface for now</p>
+              <h6>Firebase CRUD</h6>
+              <p class="grey-text">
+                Feelings are loaded from and saved to Cloud Firestore, and kept
+                on this device so they work offline too.
+              </p>
+              <button
+                id="installApp"
+                hidden
+                class="btn indigo darken-3 waves-effect waves-light"
+                type="button"
+              >
+                Install Feelings Catcher
+              </button>
             </div>
           </div>
         </div>
@@ -214,7 +204,11 @@
         <!-- Where the list came from (this device / Firebase) -->
         <p id="data-source" class="grey-text" aria-live="polite"></p>
 
-        <p id="feeling-status" class="grey-text text-darken-1" aria-live="polite"></p>
+        <p
+          id="feeling-status"
+          class="grey-text text-darken-1"
+          aria-live="polite"
+        ></p>
 
         <!-- Feelings are rendered here by app.js -->
         <div id="feelings-list"></div>
@@ -237,7 +231,9 @@
     <!-- New Feeling Form -->
     <div class="sidenav" id="feeling-form">
       <form class="container section" id="add-feeling-form">
-        <h5 id="form-title" class="indigo-text text-darken-3">Catch a New Feeling</h5>
+        <h5 id="form-title" class="indigo-text text-darken-3">
+          Catch a New Feeling
+        </h5>
         <p class="grey-text text-darken-3">
           Notice it, name it, and write down what's happening in the moment.
         </p>
