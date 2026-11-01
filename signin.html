@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <!-- Set the dark theme as default -->
+    <script>
+      (function () {
+        var theme = "dark";
+        try {
+          if (localStorage.getItem("feelings-catcher-theme") === "light") {
+            theme = "light";
+          }
+        } catch (err) {}
+        document.documentElement.setAttribute("data-theme", theme);
+      })();
+    </script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign In | Feelings Catcher</title>
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="stylesheet" href="css/materialize.min.css" />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+
+  <body class="grey lighten-4">
+    <main class="container section auth-panel">
+      <a href="index.html" class="brand-logo indigo-text text-darken-3"
+        >Feelings Catcher</a
+      >
+      <h4 class="grey-text text-darken-4">Welcome to Feelings Catcher</h4>
+      <p class="grey-text text-darken-1">
+        Sign in to view and save your feelings
+      </p>
+
+      <!-- Sign-in / sign-up errors and status show here -->
+      <p
+        id="auth-message"
+        class="red-text text-darken-2"
+        aria-live="polite"
+      ></p>
+
+      <!-- Sign In -->
+      <form id="sign-in-form">
+        <h5 class="grey-text text-darken-4">Sign In</h5>
+
+        <div class="input-field">
+          <input
+            type="email"
+            id="sign-in-email"
+            autocomplete="email"
+            required
+          />
+          <label for="sign-in-email">Email</label>
+        </div>
+
+        <div class="input-field">
+          <input
+            type="password"
+            id="sign-in-password"
+            autocomplete="current-password"
+            required
+          />
+          <label for="sign-in-password">Password</label>
+        </div>
+
+        <button
+          class="btn indigo darken-3 waves-effect waves-light"
+          type="submit"
+        >
+          Sign In
+        </button>
+
+        <p class="grey-text text-darken-1">
+          New to Feelings Catcher?
+          <a href="#" id="show-sign-up">Create an account</a>
+        </p>
+      </form>
+
+      <!-- Create an account (hidden until "Create an account" is clicked) -->
+      <form id="sign-up-form" hidden>
+        <h5 class="grey-text text-darken-4">Create an account</h5>
+
+        <div class="input-field">
+          <input
+            type="email"
+            id="sign-up-email"
+            autocomplete="email"
+            required
+          />
+          <label for="sign-up-email">Email</label>
+        </div>
+
+        <div class="input-field">
+          <input
+            type="password"
+            id="sign-up-password"
+            autocomplete="new-password"
+            minlength="6"
+            required
+          />
+          <label for="sign-up-password">Password (at least 6 characters)</label>
+        </div>
+
+        <button
+          class="btn indigo darken-3 waves-effect waves-light"
+          type="submit"
+        >
+          Create Account
+        </button>
+
+        <p class="grey-text text-darken-1"> 
+          Already have an account?
+          <a href="#" id="show-sign-in">Sign In</a>
+        </p>
+      </form>
+    </main>
+
+    <script src="js/materialize.min.js"></script>
+    <script type="module" src="js/signin.js"></script>
+  </body>
+</html>
