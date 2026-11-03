@@ -3,7 +3,6 @@ import {
   serverTimestamp,
   getDocsFromServer,
   query,
-  orderBy,
   onSnapshot,
   doc,
   setDoc,
@@ -11,13 +10,16 @@ import {
   disableNetwork,
   enableNetwork,
   setLogLevel,
+  where,
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 import { db } from "./firebaseConfig.js";
 
 setLogLevel("error"); // hide Firestore's offline retry warnings
 
 const feelingRef = collection(db, "feelings");
-const feelingsQuery = query(feelingRef, orderBy("createdAt", "desc"));
+function feelingsQueryFor(userId) {
+  return query(feelingRef, where("ownerUid", "==", userId));
+}
 
 // Turn a Firestore Timestamp (or an already-converted number) into milliseconds
 function timestampToMillis(timestamp) {
@@ -31,6 +33,7 @@ function fromFirestore(docSnap) {
 
   return {
     id: docSnap.id,
+    ownerUid: data.ownerUid || "",
     title: data.title || "",
     feelingTag: data.feelingTag || "other",
     entry: data.entry || "",
@@ -42,13 +45,13 @@ function fromFirestore(docSnap) {
 }
 
 // Read - onetime fetch request
-export async function loadFeelingsFromServer() {
-  const snapshot = await getDocsFromServer(feelingsQuery);
+export async function loadFeelingsFromServer(userId) {
+  const snapshot = await getDocsFromServer(feelingsQueryFor(userId));
   return snapshot.docs.map(fromFirestore);
 }
 
 // Apply one queued action. Stable IDs make a retried create safe from duplicates.
-export async function syncFeelingChange(change) {
+export async function syncFeelingChange(userId, change) {
   const feelingDocRef = doc(db, "feelings", change.feelingId);
 
   if (change.type === "delete") {
@@ -59,6 +62,7 @@ export async function syncFeelingChange(change) {
   const data = change.data;
   const firestoreData = {
     title: data.title,
+    ownerUid: userId,
     feelingTag: data.feelingTag,
     entry: data.entry,
     context: data.context || "",
@@ -77,9 +81,9 @@ export async function syncFeelingChange(change) {
 }
 
 // Read - real-time listener
-export function watchFeelings(onData, onError) {
+export function watchFeelings(userId, onData, onError) {
   return onSnapshot(
-    feelingsQuery,
+    feelingsQueryFor(userId),
     { includeMetadataChanges: true },
     (snapshot) => {
       onData(snapshot.docs.map(fromFirestore), {

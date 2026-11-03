@@ -304,3 +304,35 @@ body {
   margin-left: auto;
   padding: 0 8px;
 }
+/* Hide the page content until we know the user is signed in (see auth.js) */
+body.auth-pending main {
+  visibility: hidden;
+}
+
+/* Profile page: reminder time and day inputs */
+.profile-settings input[type="time"],
+.profile-settings select.browser-default {
+  margin: 0;
+}
+
+[data-theme="dark"] .profile-settings input[type="time"],
+[data-theme="dark"] .profile-settings select.browser-default {
+  color-scheme: dark;
+  background-color: transparent;
+  color: #e8eaf6;
+  border-color: #5c6bc0;
+}
+
+[data-theme="dark"] .profile-settings select.browser-default option {
+  background-color: #1f2233;
+  color: #e8eaf6;
+}
+
+[data-theme="dark"] .profile-settings input:disabled,
+[data-theme="dark"] .profile-settings select:disabled {
+  opacity: 0.5;
+}
+
+[data-theme="dark"] #email[readonly] {
+  color: #9fa8da;
+}

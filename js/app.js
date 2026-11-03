@@ -15,6 +15,9 @@ import {
   mergeServerFeelings,
 } from "./idb-storage.js";
 
+import { requiredSignedInUser, signOutUser } from "./auth.js";
+import { startReminders } from "./reminders.js";
+
 // PWA: Install logic
 let installPrompt = null;
 const installBtn = document.querySelector("#installApp");
@@ -50,14 +53,6 @@ if (installBtnMobile)
 
 // Theme logic, dark mode is default
 const THEME_KEY = "feelings-catcher-theme";
-
-function getStoredTheme() {
-  try {
-    return localStorage.getItem(THEME_KEY);
-  } catch (err) {
-    return null;
-  }
-}
 
 function setStoredTheme(theme) {
   try {
@@ -116,6 +111,19 @@ let editingFeelingId = null;
 let currentFeelings = [];
 let syncInProgress = false;
 let syncAgain = false;
+let currentUserId = null;
+let stopWatching = null;
+const signOutButtons = document.querySelectorAll(".sign-out-button");
+
+signOutButtons.forEach((button) => {
+  button.addEventListener("click", async () => {
+    try {
+      await signOutUser();
+    } catch (error) {
+      showToast(error.message);
+    }
+  });
+});
 
 function showDataSource(message) {
   if (dataSource) dataSource.textContent = message;
@@ -315,7 +323,7 @@ if (list) {
     try {
       deleteButton.disabled = true;
       // Remove it from this device and queue the delete for Firestore
-      await deleteFeelingAndQueue(id);
+      await deleteFeelingAndQueue(currentUserId, id);
       await refreshLocalList();
       await updateSyncMessage();
       showToast(
@@ -415,6 +423,7 @@ if (form) {
 
       // Save to this device first. The queue sends the change to Firestore.
       await saveFeelingAndQueue(
+        currentUserId,
         feeling,
         editingFeelingId ? "update" : "create",
       );
@@ -439,9 +448,11 @@ if (form) {
 
 // Sync status line under the list heading
 async function updateSyncMessage(message) {
+  if (!currentUserId) return;
+
   let count = 0;
   try {
-    count = (await readPendingChanges()).length;
+    count = (await readPendingChanges(currentUserId)).length;
   } catch (error) {
     console.error("Could not read the sync queue:", error);
   }
@@ -461,10 +472,11 @@ async function updateSyncMessage(message) {
 
 // Re-draw the list from IndexedDB (includes unsent changes)
 async function refreshLocalList() {
-  renderFeelings(await readAllFeelings());
+  renderFeelings(await readAllFeelings(currentUserId));
 }
 
 async function synchronizePendingChanges() {
+  if (!currentUserId) return;
   if (!navigator.onLine) {
     await updateSyncMessage();
     return;
@@ -481,14 +493,18 @@ async function synchronizePendingChanges() {
     do {
       syncAgain = false;
       let failed = false;
-      const changes = await readPendingChanges();
+      const changes = await readPendingChanges(currentUserId);
 
       for (const change of changes) {
         if (!navigator.onLine) break;
 
         try {
-          await syncFeelingChange(change);
-          await removeSyncedChange(change.feelingId, change.changeId);
+          await syncFeelingChange(currentUserId, change);
+          await removeSyncedChange(
+            currentUserId,
+            change.feelingId,
+            change.changeId,
+          );
         } catch (error) {
           // Keep this change in IndexedDB. The next connection can retry it.
           console.error("Could not sync a feeling:", error);
@@ -497,11 +513,15 @@ async function synchronizePendingChanges() {
         }
       }
 
-      const remaining = await readPendingChanges();
+      const remaining = await readPendingChanges(currentUserId);
       if (!remaining.length && navigator.onLine) {
         try {
-          const serverFeelings = await loadFeelingsFromServer();
-          const merged = await mergeServerFeelings(serverFeelings, false);
+          const serverFeelings = await loadFeelingsFromServer(currentUserId);
+          const merged = await mergeServerFeelings(
+            currentUserId,
+            serverFeelings,
+            false,
+          );
           renderFeelings(merged);
         } catch (error) {
           console.warn("Could not refresh the server list yet:", error);
@@ -521,7 +541,9 @@ async function synchronizePendingChanges() {
 }
 
 // Show the local list immediately, then merge Firestore data as it arrives.
-async function startApp() {
+async function startApp(userId) {
+  currentUserId = userId;
+  if (stopWatching) stopWatching(); // never run two listeners at once
   try {
     await refreshLocalList();
     await updateSyncMessage();
@@ -531,12 +553,14 @@ async function startApp() {
   }
 
   try {
-    watchFeelings(
+    stopWatching = watchFeelings(
+      currentUserId,
       async (remoteFeelings, metadata) => {
         try {
           const possiblyIncomplete =
             metadata.fromCache || metadata.hasPendingWrites;
           const merged = await mergeServerFeelings(
+            currentUserId,
             remoteFeelings,
             possiblyIncomplete,
           );
@@ -583,5 +607,16 @@ if (list && statusMessage) {
   });
 
   if (!navigator.onLine) void pauseFirestore();
-  void startApp();
 }
+
+requiredSignedInUser((user) => {
+  document.body.classList.remove("auth-pending");
+  signOutButtons.forEach((button) => {
+    button.hidden = false;
+  });
+  // Daily and weekly reminders run on every page while the app is open
+  startReminders(user.uid);
+
+  // Only the home page has a feelings list to load and sync
+  if (list && statusMessage) void startApp(user.uid);
+});

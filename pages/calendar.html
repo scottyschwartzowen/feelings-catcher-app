@@ -33,7 +33,7 @@
     <link rel="stylesheet" href="../css/styles.css" />
   </head>
 
-  <body class="grey lighten-4">
+  <body class="grey lighten-4 auth-pending">
     <header>
       <nav class="white z-depth-0">
         <div class="nav-wrapper container">
@@ -82,12 +82,11 @@
             </li>
             <li>
               <button
-                id="installApp"
-                hidden
-                class="btn-small indigo darken-3 waves-effect waves-light"
+                class="btn-small indigo darken-3 waves-effect waves-light sign-out-button"
                 type="button"
+                hidden
               >
-                Install App
+                Sign out
               </button>
             </li>
           </ul>
@@ -142,6 +141,16 @@
           style="margin: 16px"
         >
           Install App
+        </button>
+      </li>
+      <li>
+        <button
+          class="btn-small indigo darken-3 waves-effect waves-light sign-out-button"
+          type="button"
+          style="margin: 16px"
+          hidden
+        >
+          Sign out
         </button>
       </li>
     </ul>

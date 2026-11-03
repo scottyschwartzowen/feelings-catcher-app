@@ -1,5 +1,5 @@
-const STATIC_CACHE = "feelings-catcher-static-v4";
-const DYNAMIC_CACHE = "feelings-catcher-dynamic-v4";
+const STATIC_CACHE = "feelings-catcher-static-v7";
+const DYNAMIC_CACHE = "feelings-catcher-dynamic-v7";
 const CACHE_PREFIX = "feelings-catcher-";
 const APP_SHELL_CACHE = `${STATIC_CACHE}-shell`;
 const CURRENT_CACHES = [APP_SHELL_CACHE, DYNAMIC_CACHE];
@@ -18,6 +18,13 @@ const APP_SHELL_FILES = [
   "/js/feelingsService.js",
   "/js/firebaseConfig.js",
   "/js/idb-storage.js",
+  "/js/auth.js",
+  "/js/userSettings.js",
+  "/js/reminderSchedule.js",
+  "/js/reminders.js",
+  "/js/profile.js",
+  "/js/signin.js",
+  "/signin.html",
   "/images/icons/icon-192.png",
   "/images/icons/icon-256.png",
   "/images/icons/icon-512.png",
@@ -126,4 +133,21 @@ self.addEventListener("fetch", (event) => {
     return;
   }
   event.respondWith(cacheFirst(request));
+});
+
+// Tapping a reminder opens (or focuses) Feelings Catcher
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const target = event.notification.data?.url || "/";
+
+  event.waitUntil(
+    self.clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((windows) => {
+        for (const client of windows) {
+          if ("focus" in client) return client.focus();
+        }
+        return self.clients.openWindow(target);
+      }),
+  );
 });

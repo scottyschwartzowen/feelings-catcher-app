@@ -1,3 +1,5 @@
+// Every function below takes the signed-in user's id FIRST, because each user
+// gets their own local database on this device.
 const DATABASE_NAME = "feelings-catcher-local";
 const DATABASE_VERSION = 2;
 const STORE_NAME = "feelings";
@@ -9,12 +11,21 @@ function createChangeId() {
 }
 
 function newestFirst(feelings) {
-  return [...feelings].sort((a, b) => (b.createdAtMs || 0) - (a.createdAtMs || 0));
+  return [...feelings].sort(
+    (a, b) => (b.createdAtMs || 0) - (a.createdAtMs || 0),
+  );
 }
 
-function openDatabase() {
+function openDatabase(userId) {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DATABASE_NAME, DATABASE_VERSION);
+    if (!userId) {
+      reject(new Error("openDatabase needs a signed-in user id"));
+      return;
+    }
+    const request = indexedDB.open(
+      `${DATABASE_NAME}-${userId}`,
+      DATABASE_VERSION,
+    );
 
     request.onupgradeneeded = () => {
       const db = request.result;
@@ -34,8 +45,8 @@ function openDatabase() {
   });
 }
 
-export async function readAllFeelings() {
-  const db = await openDatabase();
+export async function readAllFeelings(userId) {
+  const db = await openDatabase(userId);
 
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE_NAME, "readonly");
@@ -48,8 +59,8 @@ export async function readAllFeelings() {
   });
 }
 
-export async function replaceFeelings(feelings) {
-  const db = await openDatabase();
+export async function replaceFeelings(userId, feelings) {
+  const db = await openDatabase(userId);
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE_NAME, "readwrite");
     const store = tx.objectStore(STORE_NAME);
@@ -69,8 +80,8 @@ export async function replaceFeelings(feelings) {
 }
 
 // Save the user's change and its sync task together, so neither is lost alone.
-export async function saveFeelingAndQueue(feeling, action) {
-  const db = await openDatabase();
+export async function saveFeelingAndQueue(userId, feeling, action) {
+  const db = await openDatabase(userId);
 
   return new Promise((resolve, reject) => {
     const tx = db.transaction([STORE_NAME, PENDING_STORE], "readwrite");
@@ -107,8 +118,8 @@ export async function saveFeelingAndQueue(feeling, action) {
 }
 
 // Store a delete task even when a create is being synced at the same time.
-export async function deleteFeelingAndQueue(feelingId) {
-  const db = await openDatabase();
+export async function deleteFeelingAndQueue(userId, feelingId) {
+  const db = await openDatabase(userId);
 
   return new Promise((resolve, reject) => {
     const tx = db.transaction([STORE_NAME, PENDING_STORE], "readwrite");
@@ -142,8 +153,8 @@ export async function deleteFeelingAndQueue(feelingId) {
 }
 
 // Every change still waiting to be sent to Firestore, oldest first
-export async function readPendingChanges() {
-  const db = await openDatabase();
+export async function readPendingChanges(userId) {
+  const db = await openDatabase(userId);
 
   return new Promise((resolve, reject) => {
     const tx = db.transaction(PENDING_STORE, "readonly");
@@ -160,8 +171,8 @@ export async function readPendingChanges() {
 
 // Remove a change only if it is still the version we just synced,
 // so an edit made while syncing is not lost.
-export async function removeSyncedChange(feelingId, changeId) {
-  const db = await openDatabase();
+export async function removeSyncedChange(userId, feelingId, changeId) {
+  const db = await openDatabase(userId);
 
   return new Promise((resolve, reject) => {
     const tx = db.transaction(PENDING_STORE, "readwrite");
@@ -185,10 +196,12 @@ export async function removeSyncedChange(feelingId, changeId) {
 }
 
 // Combine Firestore data with this device's data and unsent changes.
-// possiblyIncomplete = true means the server list might be missing things
-// (cache-only data or writes in flight), so local feelings are not dropped.
-export async function mergeServerFeelings(serverFeelings, possiblyIncomplete) {
-  const db = await openDatabase();
+export async function mergeServerFeelings(
+  userId,
+  serverFeelings,
+  possiblyIncomplete,
+) {
+  const db = await openDatabase(userId);
 
   return new Promise((resolve, reject) => {
     const tx = db.transaction([STORE_NAME, PENDING_STORE], "readwrite");
