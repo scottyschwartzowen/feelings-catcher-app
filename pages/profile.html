@@ -159,7 +159,7 @@
 
     <main class="container section">
       <div class="card-panel white">
-        <p class="indigo-text text-darken-3"><strong>YOUR ACCOUNT</strong></p>
+        <p class="indigo-text text-lighten-3"><strong>YOUR ACCOUNT</strong></p>
 
         <h3 class="grey-text text-darken-4">Profile &amp; Settings</h3>
 
@@ -200,7 +200,7 @@
         <div class="divider"></div>
 
         <div class="section profile-settings">
-          <h6 class="grey-text text-darken-4">Notifications</h6>
+          <h6 class="grey-text text-darken-4">Reminders</h6>
           <p class="grey-text text-darken-1" id="notification-status"></p>
 
           <div class="row valign-wrapper">
@@ -210,7 +210,12 @@
               </p>
             </div>
             <div class="col s6 m3">
-              <input type="time" id="daily-time" value="20:00" aria-label="Daily reminder time" />
+              <input
+                type="time"
+                id="daily-time"
+                value="20:00"
+                aria-label="Daily reminder time"
+              />
             </div>
             <div class="col s6 m3 right-align">
               <div class="switch">
@@ -229,7 +234,11 @@
               <p class="grey-text text-darken-1">Weekly check-in reminder</p>
             </div>
             <div class="col s6 m3">
-              <select id="weekly-day" class="browser-default" aria-label="Weekly reminder day">
+              <select
+                id="weekly-day"
+                class="browser-default"
+                aria-label="Weekly reminder day"
+              >
                 <option value="0">Sunday</option>
                 <option value="1">Monday</option>
                 <option value="2">Tuesday</option>
@@ -240,7 +249,12 @@
               </select>
             </div>
             <div class="col s6 m2">
-              <input type="time" id="weekly-time" value="18:00" aria-label="Weekly reminder time" />
+              <input
+                type="time"
+                id="weekly-time"
+                value="18:00"
+                aria-label="Weekly reminder time"
+              />
             </div>
             <div class="col s12 m3 right-align">
               <div class="switch">
@@ -259,7 +273,7 @@
             class="btn-small indigo darken-3 waves-effect waves-light"
             type="button"
           >
-            Send test notification
+            Send test reminder
           </button>
         </div>
 

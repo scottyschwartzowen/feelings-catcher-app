@@ -336,3 +336,39 @@ body.auth-pending main {
 [data-theme="dark"] #email[readonly] {
   color: #9fa8da;
 }
+
+/* Materialize's .btn sets display, which overrides the hidden attribute.
+   This makes hidden buttons really hidden. */
+[hidden] {
+  display: none !important;
+}
+
+/* Notification buttons on the home page */
+#disable-notifications {
+  display: block;
+  margin: 12px auto 0;
+}
+
+#enable-notifications {
+  margin-bottom: 8px;
+}
+
+/* "Turn Off Notifications" is dark indigo on a dark card: make it readable */
+[data-theme="dark"] #disable-notifications {
+  color: #c5cae9 !important;
+  border: 1px solid #7986cb;
+}
+
+[data-theme="dark"] #disable-notifications:hover {
+  background-color: rgba(197, 202, 233, 0.12);
+}
+
+/* Space between the notification buttons and the install button */
+#installApp {
+  margin-top: 4px;
+  margin-bottom: 20px;
+}
+
+#disable-notifications {
+  margin-bottom: 8px;
+}

@@ -16,6 +16,11 @@ import {
 } from "./idb-storage.js";
 
 import { requiredSignedInUser, signOutUser } from "./auth.js";
+import {
+  enablePushNotifications,
+  disablePushNotifications,
+  hasPushRegistration,
+} from "./notifications.js";
 import { startReminders } from "./reminders.js";
 
 // PWA: Install logic
@@ -114,6 +119,13 @@ let syncAgain = false;
 let currentUserId = null;
 let stopWatching = null;
 const signOutButtons = document.querySelectorAll(".sign-out-button");
+const enablePushNotificationsButton = document.querySelector(
+  "#enable-notifications",
+);
+const disablePushNotificationsButton = document.querySelector(
+  "#disable-notifications",
+);
+const notificationStatus = document.querySelector("#notification-status");
 
 signOutButtons.forEach((button) => {
   button.addEventListener("click", async () => {
@@ -124,6 +136,64 @@ signOutButtons.forEach((button) => {
     }
   });
 });
+
+function showNotificationState(userId) {
+  if (!enablePushNotificationsButton || !notificationStatus) return;
+
+  if (!("Notification" in window)) {
+    notificationStatus.textContent =
+      "This browser does not support notifications.";
+    return;
+  }
+
+  const enabled =
+    Notification.permission === "granted" && hasPushRegistration(userId);
+  enablePushNotificationsButton.hidden = enabled;
+  disablePushNotificationsButton.hidden = !enabled;
+  notificationStatus.textContent = enabled
+    ? "Notifications are enabled on this device."
+    : "Get a notification on your devices when a feeling is added.";
+}
+
+if (enablePushNotificationsButton) {
+  enablePushNotificationsButton.addEventListener("click", async () => {
+    enablePushNotificationsButton.disabled = true;
+    try {
+      const enabled = await enablePushNotifications(currentUserId);
+      if (enabled) {
+        notificationStatus.textContent =
+          "Notifications are enabled on this device.";
+        enablePushNotificationsButton.hidden = true;
+        disablePushNotificationsButton.hidden = false;
+      } else {
+        notificationStatus.textContent =
+          "Permission was not granted. You can change it in your browser settings.";
+      }
+    } catch (error) {
+      notificationStatus.textContent = error.message;
+      console.error("Could not enable notifications:", error);
+    } finally {
+      enablePushNotificationsButton.disabled = false;
+    }
+  });
+}
+
+if (disablePushNotificationsButton) {
+  disablePushNotificationsButton.addEventListener("click", async () => {
+    disablePushNotificationsButton.disabled = true;
+    try {
+      await disablePushNotifications(currentUserId);
+      notificationStatus.textContent = "Notifications are off on this device.";
+      disablePushNotificationsButton.hidden = true;
+      enablePushNotificationsButton.hidden = false;
+    } catch (error) {
+      notificationStatus.textContent = error.message;
+      console.error("Could not disable notifications:", error);
+    } finally {
+      disablePushNotificationsButton.disabled = false;
+    }
+  });
+}
 
 function showDataSource(message) {
   if (dataSource) dataSource.textContent = message;
@@ -616,6 +686,10 @@ requiredSignedInUser((user) => {
   });
   // Daily and weekly reminders run on every page while the app is open
   startReminders(user.uid);
+
+  // currentUserId is needed by the notification buttons on the home page
+  currentUserId = user.uid;
+  showNotificationState(user.uid);
 
   // Only the home page has a feelings list to load and sync
   if (list && statusMessage) void startApp(user.uid);

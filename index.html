@@ -166,7 +166,7 @@
       <section class="container section">
         <div class="row">
           <div class="col s12 m8">
-            <p class="indigo-text text-darken-3">
+            <p class="indigo-text text-lighten-3">
               <strong>VOICE-FIRST FEELINGS JOURNAL</strong>
             </p>
             <h3 class="grey-text text-darken-4">
@@ -185,11 +185,13 @@
               <i class="material-icons medium indigo-text text-darken-3"
                 >cloud_done</i
               >
-              <h6>Firebase CRUD</h6>
+              <h6>Offline Ready</h6>
               <p class="grey-text">
                 Feelings are loaded from and saved to Cloud Firestore, and kept
                 on this device so they work offline too.
               </p>
+              <h6>Install to Device</h6>
+              <!-- PWA Install Button -->
               <button
                 id="installApp"
                 hidden
@@ -197,6 +199,25 @@
                 type="button"
               >
                 Install Feelings Catcher
+              </button>
+
+              <!-- Enable/Disable Notifications Button -->
+              <p id="notification-status" class="grey-text"></p>
+              <button
+                id="enable-notifications"
+                class="btn indigo darken-3 waves-effect waves-light"
+                type="button"
+                hidden
+              >
+                Enable Notifications
+              </button>
+              <button
+                id="disable-notifications"
+                class="btn-flat indigo-text text-darken-3"
+                type="button"
+                hidden
+              >
+                Turn Off Notifications
               </button>
             </div>
           </div>

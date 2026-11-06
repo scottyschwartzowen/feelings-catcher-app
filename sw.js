@@ -1,5 +1,25 @@
-const STATIC_CACHE = "feelings-catcher-static-v7";
-const DYNAMIC_CACHE = "feelings-catcher-dynamic-v7";
+importScripts(
+  "https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js",
+);
+importScripts(
+  "https://www.gstatic.com/firebasejs/12.19.0/firebase-messaging-compat.js",
+);
+
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyAubu5USmXW2wB8QE2IfVAO-rOLOI-eSNk",
+  authDomain: "feelings-catcher-54b32.firebaseapp.com",
+  projectId: "feelings-catcher-54b32",
+  storageBucket: "feelings-catcher-54b32.firebasestorage.app",
+  messagingSenderId: "690869311862",
+  appId: "1:690869311862:web:a222585b6349f93f310257",
+};
+
+firebase.initializeApp(firebaseConfig);
+firebase.messaging(); // lets Firebase show push notifications while the app is closed
+
+const STATIC_CACHE = "feelings-catcher-static-v8";
+const DYNAMIC_CACHE = "feelings-catcher-dynamic-v8";
 const CACHE_PREFIX = "feelings-catcher-";
 const APP_SHELL_CACHE = `${STATIC_CACHE}-shell`;
 const CURRENT_CACHES = [APP_SHELL_CACHE, DYNAMIC_CACHE];
@@ -23,6 +43,7 @@ const APP_SHELL_FILES = [
   "/js/reminderSchedule.js",
   "/js/reminders.js",
   "/js/profile.js",
+  "/js/notifications.js",
   "/js/signin.js",
   "/signin.html",
   "/images/icons/icon-192.png",
@@ -137,6 +158,9 @@ self.addEventListener("fetch", (event) => {
 
 // Tapping a reminder opens (or focuses) Feelings Catcher
 self.addEventListener("notificationclick", (event) => {
+  // Push notifications from Firebase are opened by Firebase's own handler
+  if (event.notification.data?.FCM_MSG) return;
+
   event.notification.close();
   const target = event.notification.data?.url || "/";
 
