@@ -27,15 +27,28 @@ import { startReminders } from "./reminders.js";
 let installPrompt = null;
 const installBtn = document.querySelector("#installApp");
 const installBtnMobile = document.querySelector("#installAppMobile");
+const installHeading = document.querySelector("#install-heading");
+const installHint = document.querySelector("#install-hint");
 
 function showInstallButtons() {
   if (installBtn) installBtn.hidden = false;
   if (installBtnMobile) installBtnMobile.hidden = false;
+  if (installHeading) installHeading.hidden = false;
+  if (installHint) installHint.hidden = true;
 }
 
 function hideInstallButtons() {
   if (installBtn) installBtn.hidden = true;
   if (installBtnMobile) installBtnMobile.hidden = true;
+  if (installHeading) installHeading.hidden = true;
+}
+
+// Safari has no install prompt event, so show the manual steps instead
+// (but not when the app is already installed and running on its own)
+const isInstalled = window.matchMedia("(display-mode: standalone)").matches;
+if (installHint && !("onbeforeinstallprompt" in window) && !isInstalled) {
+  if (installHeading) installHeading.hidden = false;
+  installHint.hidden = false;
 }
 
 window.addEventListener("beforeinstallprompt", (event) => {
