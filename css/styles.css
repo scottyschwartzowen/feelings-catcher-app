@@ -343,14 +343,20 @@ body.auth-pending main {
   display: none !important;
 }
 
-/* Notification buttons on the home page */
+/* Buttons in the Firebase CRUD card: centred and never wider than the card */
+#installApp,
+#enable-notifications,
 #disable-notifications {
   display: block;
-  margin: 12px auto 0;
-}
-
-#enable-notifications {
-  margin-bottom: 8px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 220px;
+  margin: 0 auto 16px;
+  padding: 10px 12px;
+  height: auto;
+  min-height: 36px;
+  line-height: 1.3;
+  white-space: normal; /* long labels wrap instead of overflowing the card */
 }
 
 /* "Turn Off Notifications" is dark indigo on a dark card: make it readable */
@@ -361,14 +367,4 @@ body.auth-pending main {
 
 [data-theme="dark"] #disable-notifications:hover {
   background-color: rgba(197, 202, 233, 0.12);
-}
-
-/* Space between the notification buttons and the install button */
-#installApp {
-  margin-top: 4px;
-  margin-bottom: 20px;
-}
-
-#disable-notifications {
-  margin-bottom: 8px;
 }
