@@ -44,7 +44,6 @@ function showToast(message) {
 }
 
 // ----- Account -----
-
 function nameFor(user) {
   return user.displayName || (user.email || "").split("@")[0] || "Friend";
 }
@@ -91,7 +90,6 @@ saveNameButton.addEventListener("click", async () => {
 });
 
 // ----- Notifications -----
-
 function describePermission() {
   const state = permissionState();
   if (state === "unsupported") {
@@ -186,7 +184,6 @@ testButton.addEventListener("click", async () => {
 });
 
 // ----- Start -----
-
 requiredSignedInUser(async (user) => {
   currentUser = user;
   showUser(user);

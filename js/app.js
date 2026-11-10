@@ -75,8 +75,9 @@ const THEME_KEY = "feelings-catcher-theme";
 function setStoredTheme(theme) {
   try {
     localStorage.setItem(THEME_KEY, theme);
-  } catch (err) {
-    // no localStorage yet - theme won't persist across reloads.
+  } catch {
+    // Storage can be blocked (private mode, blocked site data) or full.
+    // The theme still changes for this visit, but it won't be remembered.
   }
 }
 
